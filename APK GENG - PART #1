@@ -1,1 +1,53 @@
+PART #1 
+
+YANG HARUS DI COPY
+
+classpath 'com.google.gms:google-services:3.1.0'
+
+
+
+
+
+###################################################################################################################################################
+[BUILD GRADLE DI LUAR FOLDER APP]
+
+buildscript {
+    repositories {
+        jcenter()
+		google()
+		maven()
+    }
+    dependencies {
+    classpath 'com.android.tools.build:gradle:1.+'
+		classpath 'com.google.gms:google-services:4.3.5'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+		google()
+		maven()
+    }
+}
+
+
+
+
+[BUILD GRADLE DI DALAM FOLDER APP]
+
+dependencies {
+  compile 'com.android.support:appcompat-v7:25.3.0'
+	compile 'com.android.support:design:25.3.0'
+	
+	compile 'com.google.firebase:firebase-auth:11.0.4'
+	
+  compile fileTree(dir: 'libs', include: ['*.jar'])
+  
+  
+}
+
 
