@@ -14,8 +14,10 @@ classpath 'com.google.gms:google-services:3.1.0'
 buildscript {
     repositories {
         jcenter()
+	
 		google()
 		maven()
+		
     }
     dependencies {
     classpath 'com.android.tools.build:gradle:1.+'
@@ -40,12 +42,12 @@ allprojects {
 [BUILD GRADLE DI DALAM FOLDER APP]
 
 dependencies {
-  compile 'com.android.support:appcompat-v7:25.3.0'
+        compile 'com.android.support:appcompat-v7:25.3.0'
 	compile 'com.android.support:design:25.3.0'
 	
 	compile 'com.google.firebase:firebase-auth:11.0.4'
 	
-  compile fileTree(dir: 'libs', include: ['*.jar'])
+        compile fileTree(dir: 'libs', include: ['*.jar'])
   
   
 }
