@@ -1,1 +1,269 @@
 
+COPY CODE UNTUK PART #3
+
+[main_activity.xml]---------------------------------------------------
+
+
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical"
+	android:background="#FFFFFFFF">
+
+	<ImageView
+		android:layout_height="100dp"
+		android:layout_width="100dp"
+		android:src="@drawable/icon"
+		android:layout_alignParentTop="true"
+		android:layout_centerHorizontal="true"
+		android:layout_gravity="center_horizontal"
+		android:layout_marginTop="100dp"/>
+
+	<ProgressBar
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center_horizontal"
+		android:layout_marginTop="10dp"
+		android:id="@+id/progress_bar"/>
+
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Selamat Datang / Masuk atau Register"
+		android:textAppearance="?android:attr/textAppearanceLarge"
+		android:layout_gravity="bottom|center_horizontal"
+		android:gravity="bottom|center_horizontal"
+		android:layout_marginTop="300dp"
+		android:id="@+id/txt_lanjut_register"/>
+
+</LinearLayout>
+
+
+
+
+
+
+
+[MainActivity.java]---------------------------------------------------
+
+
+package com.lfast.application;
+
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.os.Handler;
+import android.view.View;
+import android.content.Intent;
+import android.widget.Toast;
+
+public class MainActivity extends AppCompatActivity {
+    
+	private int time=2000;
+	Boolean runON = false;
+	Boolean runOFF = true;
+	Boolean dialog = false;
+	
+	protected ProgressBar pb;
+	protected TextView txtlanjut;
+	
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+		
+		pb = (ProgressBar) findViewById(R.id.progress_bar);
+		txtlanjut = (TextView) findViewById(R.id.txt_lanjut_register);
+		
+		txtlanjut.setVisibility(View.INVISIBLE);
+		
+		
+		new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+					if (!runON){				
+						pb.setVisibility(View.INVISIBLE);
+						txtlanjut.setVisibility(View.VISIBLE);
+						
+					}
+					runON = !runON;				
+				}
+
+			},time);
+	
+
+		txtlanjut.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {		
+				    Intent intent = new Intent(getApplicationContext(), RegistrationActivity.class);
+					startActivity(intent);
+
+					showMessage("Selamat datang di lfast");
+				}
+			});	
+
+		
+		
+    }
+	
+	
+	
+	private void showMessage(String message) {
+        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
+
+	}
+	
+    
+}
+
+
+
+
+
+
+
+
+[activity_registration.xml]-------------------------------------------------------------------------------------
+
+
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:background="#FFFFFFFF">
+
+	<TextView
+		android:text="Nomor telpon"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:typeface="sans"
+		android:textSize="16sp"
+		android:textStyle="bold"
+		android:layout_marginLeft="10dp"
+		android:layout_alignParentBottom="true"
+		android:layout_marginBottom="260dp"/>
+
+	<ImageView
+		android:layout_height="100dp"
+		android:layout_width="100dp"
+		android:src="@drawable/icon"
+		android:layout_alignParentTop="true"
+		android:layout_centerHorizontal="true"
+		android:layout_gravity="center_horizontal"
+		android:layout_marginTop="100dp"/>
+
+	<EditText
+		android:layout_width="match_parent"
+		android:inputType="number"
+		android:layout_height="55dp"
+		android:ems="10"
+		android:hint="Nomor telpon"
+		android:layout_marginLeft="10dp"
+		android:textSize="18sp"
+		android:maxLength="13"
+		android:digits="0123456789"
+		android:id="@+id/ed_number"
+		android:layout_marginRight="10dp"
+		android:textStyle="bold|normal"
+		android:typeface="sans"
+		android:textColorHint="#A8F6F6F6"
+		android:paddingLeft="10dp"
+		android:paddingRight="10dp"
+		android:textColor="#FF555555"
+		android:layout_gravity="center"
+		android:layout_marginTop="26dp"
+		android:layout_alignParentBottom="true"
+		android:layout_marginBottom="200dp"/>
+
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Register lewat nomor telpon"
+		android:textAppearance="?android:attr/textAppearanceLarge"
+		android:layout_centerHorizontal="true"
+		android:layout_alignParentTop="true"
+		android:layout_marginTop="20dp"
+		android:typeface="sans"
+		android:textStyle="bold|normal"/>
+
+	<Button
+		android:layout_width="match_parent"
+		style="?android:attr/buttonStyleSmall"
+		android:layout_height="60dp"
+		android:text="Lanjut verifikasi"
+		android:layout_alignParentBottom="true"
+		android:id="@+id/btn_verifikasi"/>
+	
+	
+	
+
+</RelativeLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[build.gradle]--------------------------------------------------------------------------------------
+
+
+dependencies {
+	
+    compile 'com.android.support:appcompat-v7:25.3.0'
+	compile 'com.android.support:design:25.3.0'
+	compile 'com.google.firebase:firebase-auth:11.0.4'
+	
+
+	
+	compile 'de.hdodenhof:circleimageview:2.2.0' 
+	
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+	
+	
+}
+apply plugin: 'com.google.gms.google-services'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
