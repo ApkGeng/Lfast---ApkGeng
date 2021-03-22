@@ -1,0 +1,165 @@
+
+Sambil liat video apkgeng jangan lupa copy code di bawah ini 👇
+
+
+
+
+HomeActivity.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<TextView
+		
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Selamat Data User"
+		android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+	
+	<FrameLayout
+		android:id="@+id/container_fragment"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="#00000000">
+
+	</FrameLayout>
+	
+	
+	
+</LinearLayout>
+
+
+
+
+[HomeActivity.java]
+import com.lfast.app.R;
+
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import com.lfast.app.FragmentMapsCustomers;
+import android.support.v4.app.Fragment;
+
+
+public class HomeActivity extends AppCompatActivity {
+    
+    public static final String TAG = "HomeActivity";
+    
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_home);
+		
+		
+		getFragmentPage(new FragmentMapsCustomers());
+		
+		
+		
+    }
+	
+
+
+
+	private boolean getFragmentPage(Fragment fragment){
+        if (fragment != null){	
+			//layout.setBackgroundColor(getResources().getColor(R.color.grey_300));
+            getSupportFragmentManager().beginTransaction().replace(R.id.container_fragment, fragment).commit();
+
+            return true;
+		}
+
+        return false;
+    }
+}
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  Bagian Firebase Outomatic Phone Login Tambahkan Kode ini
+  
+  
+  mAuth = FirebaseAuth.getInstance();
+        mUser = FirebaseAuth.getInstance().getCurrentUser();
+		mUser = mAuth.getCurrentUser();
+
+
+
+FirebaseUser mUser = mAuth.getCurrentUser();
+		if (mUser != null) {	
+			Intent intent = new Intent(PhoneLogin.this, HomeActivity.class);
+			//intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+			startActivity(intent);
+		    }else{
+			//pb.setVisibility(View.VISIBLE);
+			}
+		if (mAuthListener==null){
+		    //lanjuttext.setVisibility(View.VISIBLE);
+			//pb.setVisibility(View.INVISIBLE);
+			
+
+		}
+
+
+
+////JIKA USER SUDAH TERDAFTAR . KETIKA APLIKASI DI TUTUP MAKA OTOMATIS LOGIN KE HOME
+	@Override
+    protected void onStart() {	
+		mAuthListener = new FirebaseAuth.AuthStateListener() {
+			@Override
+			public void onAuthStateChanged(@NonNull FirebaseAuth mAuth) {
+				FirebaseUser mUser = mAuth.getCurrentUser();
+				if (mUser != null) {				 
+               Intent intent = new Intent(Loading.this, BerandaLFast.class);
+						startActivity(intent);
+			
+					}else{
+						
+						
+					}
+			    }
+
+            }
+        };
+
+		super.onStart();	
+	    
+    }
+    
+    
+    
+    
+    
+    
+    
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
