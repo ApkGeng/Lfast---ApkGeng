@@ -1,0 +1,357 @@
+CODE PART 4 
+
+
+
+SEMBARI NONTON VIDEO PART #4 KALIAN BISA COPY CODE DI BAWAH INI 👇
+
+JANGAN LUPA [SUBSCRIBE YA GUYS] 🙏🏻 DAN TERIMAKASIH YANG UDAH DUKUNG CHANNEL INI❤️
+
+https://youtube.com/channel/UCMbu_E-IsPPa1QvgbKK8gQA
+
+
+
+
+
+
+
+
+
+
+
+
+
+PhoneLogin.java
+
+
+
+
+package com.lfast.app.users.Register;
+
+import com.lfast.app.R;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.design.widget.CoordinatorLayout;
+import android.view.View;
+import android.widget.TextView;
+import android.view.animation.TranslateAnimation;
+import android.widget.EditText;
+import android.content.Intent;
+import com.google.firebase.auth.PhoneAuthProvider;
+import java.util.concurrent.TimeUnit;
+import com.lfast.app.users.HOME.HomeActivity;
+import android.support.annotation.NonNull;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.FirebaseException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import android.widget.Toast;
+import com.google.android.gms.tasks.TaskExecutors;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import android.support.design.widget.Snackbar;
+import android.widget.ProgressBar;
+
+public class PhoneLogin extends AppCompatActivity {
+    
+    public static final String TAG = "Register";
+	protected FirebaseAuth mAuth;
+    protected FirebaseUser mCurrentUser;
+    protected boolean opened;
+	protected boolean closes;
+	protected CoordinatorLayout view;
+	protected TextView btnLoginnomortelpon;
+	protected EditText edNomortelpon;
+	protected EditText edIdnumber;
+	protected ProgressBar progressbar;
+	private String mVerificationId;
+
+    //The edittext to input the code
+    private EditText editTextCode;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_phone_login);
+		
+		edIdnumber = (EditText) findViewById(R.id.ed_id_number);
+		edNomortelpon = (EditText) findViewById(R.id.ed_phone_number);
+		btnLoginnomortelpon = (TextView) findViewById(R.id.btn_Login);
+		progressbar = (ProgressBar) findViewById(R.id.progress_bar);
+		
+	    //COORDINATOR LAYOUT
+		view = (CoordinatorLayout) findViewById(R.id.view_coordinator_layout);
+		view.setVisibility(View.INVISIBLE);
+		
+		
+		//ANIMATION
+		findViewById(R.id.txt_nomor_telpon).setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if(!opened){
+						view.setVisibility(View.VISIBLE);
+						edNomortelpon.setEnabled(true);
+						edIdnumber.setEnabled(false);
+						btnLoginnomortelpon.setEnabled(true);
+						TranslateAnimation animate = new TranslateAnimation(
+							0,
+							0,
+							view.getHeight(),
+							0);
+						animate.setDuration(500);
+						animate.setFillAfter(true);
+						view.startAnimation(animate);
+						
+					}
+					opened = !opened;
+				}
+			});
+			
+			
+			
+		//CLOSE ANIMATION
+		findViewById(R.id.btn_close).setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if(!closes){
+						view.setVisibility(View.INVISIBLE);
+						edNomortelpon.setEnabled(false);
+						edNomortelpon.getText().clear();
+						edIdnumber.setEnabled(false);
+						btnLoginnomortelpon.setEnabled(false);
+
+						TranslateAnimation animate = new TranslateAnimation(
+							0,
+							0,
+							0,
+							view.getHeight());
+						animate.setDuration(500);
+						animate.setFillAfter(true);
+						view.startAnimation(animate);
+						
+					}
+					closes = !closes;
+				}
+			});		
+			
+	
+		///Button pasing number
+		findViewById(R.id.btn_Login).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				progressbar.setVisibility(View.VISIBLE);
+				String mobile = edNomortelpon.getText().toString().trim();
+				if(mobile.isEmpty() || mobile.length() < 10){
+					edNomortelpon.setError("Nomor Telpon Salah !");
+					edNomortelpon.requestFocus();
+					progressbar.setVisibility(View.INVISIBLE);
+					return;
+					}
+
+					Intent intent = new Intent(PhoneLogin.this, VerifikasiNumber.class);
+					intent.putExtra("mobile", mobile);
+					startActivity(intent);
+					progressbar.setVisibility(View.INVISIBLE);
+				}
+			});
+		
+		 	
+		}
+		
+
+}
+
+
+
+
+
+
+
+VerifikasiNumber.java
+
+
+
+
+package com.lfast.app.users.Register;
+
+import com.lfast.app.R;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import android.widget.TextView;
+import android.view.View;
+import com.jkb.vcedittext.VerificationCodeEditText;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.android.gms.tasks.OnCompleteListener;
+import android.annotation.NonNull;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.android.gms.tasks.Task;
+import android.content.Intent;
+import com.lfast.app.users.HOME.HomeActivity;
+import java.util.concurrent.TimeUnit;
+import android.util.Log;
+import com.google.firebase.FirebaseException;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.FirebaseTooManyRequestsException;
+import android.widget.Toast;
+import android.support.design.widget.Snackbar;
+import com.google.android.gms.tasks.TaskExecutors;
+
+public class VerifikasiNumber extends AppCompatActivity {
+    
+	
+
+    public static final String TAG = "VerifikasiNumber";
+    protected FirebaseAuth mAuth;
+    protected FirebaseUser mCurrentUser;
+	protected TextView txt_verifikasiCode;
+	protected VerificationCodeEditText edCodeOtp;
+
+	protected String VerificationCode;
+	protected String phoneNumber;
+
+	private PhoneAuthProvider.ForceResendingToken mResendToken;
+    private String mVerificationId;
+	
+	
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_verifikasi_number);
+		
+		mAuth = FirebaseAuth.getInstance();
+        mCurrentUser = mAuth.getCurrentUser();
+
+		edCodeOtp = (VerificationCodeEditText) findViewById(R.id.ed_code);
+
+		Intent intent = getIntent();
+        String mobile = intent.getStringExtra("mobile");
+        sendVerificationCode(mobile);
+
+    }
+
+	private void sendVerificationCode(String mobile) {
+        PhoneAuthProvider.getInstance().verifyPhoneNumber(
+			"+62" + mobile,
+			60,
+			TimeUnit.SECONDS,
+			TaskExecutors.MAIN_THREAD,
+			mCallbacks);
+    }
+
+
+    //the callback to detect the verification status
+    private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+        @Override
+        public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
+
+            //Getting the code sent by SMS
+            String code = phoneAuthCredential.getSmsCode();
+
+            //sometime the code is not detected automatically
+            //in this case the code will be null
+            //so user has to manually enter the code
+            if (code != null) {
+                edCodeOtp.setText(code);
+                //verifying the code
+                verifyVerificationCode(code);
+            }
+        }
+
+        @Override
+        public void onVerificationFailed(FirebaseException e) {
+            Toast.makeText(VerifikasiNumber.this, e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onCodeSent(String s, PhoneAuthProvider.ForceResendingToken forceResendingToken) {
+            super.onCodeSent(s, forceResendingToken);
+
+            //storing the verification id that is sent to the user
+            mVerificationId = s;
+        }
+    };
+
+
+    private void verifyVerificationCode(String code) {
+        //creating the credential
+        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, code);
+
+        //signing the user
+        signInWithPhoneAuthCredential(credential);
+    }
+
+    private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
+        mAuth.signInWithCredential(credential)
+			.addOnCompleteListener(VerifikasiNumber.this, new OnCompleteListener<AuthResult>() {
+				@Override
+				public void onComplete(@NonNull Task<AuthResult> task) {
+					if (task.isSuccessful()) {
+						//verification successful we will start the profile activity
+						Intent intent = new Intent(VerifikasiNumber.this, HomeActivity.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+						startActivity(intent);
+
+					} else {
+
+						//verification unsuccessful.. display an error message
+
+						String message = "Somthing is wrong, we will fix it soon...";
+
+						if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+							message = "Invalid code entered...";
+						}
+
+						Snackbar snackbar = Snackbar.make(findViewById(R.id.parent), message, Snackbar.LENGTH_LONG);
+						snackbar.setAction("Dismiss", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+
+                                }
+                            });
+						snackbar.show();
+					}
+				}
+			});
+	}	
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
