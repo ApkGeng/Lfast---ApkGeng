@@ -1,1 +1,942 @@
 
+CODE PART #6. 
+
+
+SAMBIL NONTON VIDEO APKGENG SAMBIL SUBSCRIBE YA 😍😁
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:background="#FFAEFDAB">
+
+	<com.google.android.gms.maps.MapView
+		android:layout_width="match_parent"
+		android:id="@+id/map_users"
+		android:layout_height="match_parent"
+		android:background="#FFFFFFFF"
+		android:layout_marginTop="100dp"/>
+
+</RelativeLayout>
+
+
+
+
+
+
+
+PhoneLogin.java
+
+
+
+import com.lfast.app.R;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.design.widget.CoordinatorLayout;
+import android.view.View;
+import android.widget.TextView;
+import android.view.animation.TranslateAnimation;
+import android.widget.EditText;
+import android.content.Intent;
+import com.google.firebase.auth.PhoneAuthProvider;
+import java.util.concurrent.TimeUnit;
+import com.lfast.app.users.Home.HomeActivity;
+import android.support.annotation.NonNull;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.FirebaseException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import android.widget.Toast;
+import com.google.android.gms.tasks.TaskExecutors;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import android.support.design.widget.Snackbar;
+import android.widget.ProgressBar;
+import android.annotation.TargetApi;
+import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
+import com.google.firebase.auth.FirebaseAuth;
+import android.widget.ProgressBar;
+import android.widget.EditText;
+import android.support.annotation.NonNull;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.auth.AuthResult;
+import com.google.android.gms.tasks.Task;
+import android.widget.Button;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.DatabaseReference;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.widget.FrameLayout;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.ActivityCompat;
+import android.content.pm.PackageManager;
+import android.Manifest;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import android.util.Log;
+import android.app.ProgressDialog;
+import android.util.Patterns;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import android.support.v7.app.AlertDialog;
+import android.view.LayoutInflater;
+import android.os.Handler;
+import android.content.DialogInterface;
+import android.view.Gravity;
+import android.graphics.Color;
+import android.webkit.ValueCallback;
+import com.google.android.gms.tasks.OnSuccessListener;
+import android.view.KeyEvent;
+import android.widget.ImageView;
+import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
+
+
+public class PhoneLogin extends AppCompatActivity {
+    
+    public static final String TAG = "Register";
+	public static final int REQUEST_CODE_PERMISSIONS = 101;
+    protected static final int MY_PERMISSION_REQUEST_CODE = 1;
+	
+	protected FirebaseAuth mAuth;
+    protected FirebaseUser mCurrentUser;
+    protected boolean opened;
+	protected boolean closes;
+	protected CoordinatorLayout view;
+	protected TextView btnLoginnomortelpon;
+	protected EditText edNomortelpon;
+	protected EditText edIdnumber;
+	protected ProgressBar progressbar;
+	private String mVerificationId;
+
+    //The edittext to input the code
+    private EditText editTextCode;
+	
+	protected FirebaseAuth.AuthStateListener mAuthListener ;
+	
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_phone_login);
+		
+		mAuth = FirebaseAuth.getInstance();
+        mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
+		mCurrentUser = mAuth.getCurrentUser();
+		
+		
+		FirebaseUser mUser = mAuth.getCurrentUser();
+		if (mUser != null) {	
+			Intent intent = new Intent(PhoneLogin.this, HomeActivity.class);
+			startActivity(intent);
+		}else{
+			//pb.setVisibility(View.VISIBLE);
+		}
+		if (mAuthListener==null){
+		    //lanjuttext.setVisibility(View.VISIBLE);
+			//pb.setVisibility(View.INVISIBLE);
+
+
+		}
+		
+		
+		
+		edIdnumber = (EditText) findViewById(R.id.ed_id_number);
+		edNomortelpon = (EditText) findViewById(R.id.ed_phone_number);
+		btnLoginnomortelpon = (TextView) findViewById(R.id.btn_Login);
+		progressbar = (ProgressBar) findViewById(R.id.progress_bar);
+		
+	    //COORDINATOR LAYOUT
+		view = (CoordinatorLayout) findViewById(R.id.view_coordinator_layout);
+		view.setVisibility(View.INVISIBLE);
+		
+		
+		//ANIMATION
+		findViewById(R.id.txt_nomor_telpon).setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if(!opened){
+						view.setVisibility(View.VISIBLE);
+						edNomortelpon.setEnabled(true);
+						edIdnumber.setEnabled(false);
+						btnLoginnomortelpon.setEnabled(true);
+						TranslateAnimation animate = new TranslateAnimation(
+							0,
+							0,
+							view.getHeight(),
+							0);
+						animate.setDuration(500);
+						animate.setFillAfter(true);
+						view.startAnimation(animate);
+						
+					}
+					opened = !opened;
+				}
+			});
+			
+			
+			
+		//CLOSE ANIMATION
+		findViewById(R.id.btn_close).setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if(!closes){
+						view.setVisibility(View.INVISIBLE);
+						edNomortelpon.setEnabled(false);
+						edNomortelpon.getText().clear();
+						edIdnumber.setEnabled(false);
+						btnLoginnomortelpon.setEnabled(false);
+
+						TranslateAnimation animate = new TranslateAnimation(
+							0,
+							0,
+							0,
+							view.getHeight());
+						animate.setDuration(500);
+						animate.setFillAfter(true);
+						view.startAnimation(animate);
+						
+					}
+					closes = !closes;
+				}
+			});		
+			
+	
+		///Button pasing number
+		findViewById(R.id.btn_Login).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				progressbar.setVisibility(View.VISIBLE);
+				String mobile = edNomortelpon.getText().toString().trim();
+				if(mobile.isEmpty() || mobile.length() < 10){
+					edNomortelpon.setError("Nomor Telpon Salah !");
+					edNomortelpon.requestFocus();
+					progressbar.setVisibility(View.INVISIBLE);
+					return;
+					}
+
+					Intent intent = new Intent(PhoneLogin.this, VerifikasiNumber.class);
+					intent.putExtra("mobile", mobile);
+					startActivity(intent);
+					progressbar.setVisibility(View.INVISIBLE);
+				}
+			});	
+		}
+	
+		
+		
+		
+   //PERMITION LOKASI DI LATAR BELAKANG
+	private void showMessage(String message) {
+        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
+
+	}
+
+	private void RequestLocationPermission() {
+        boolean foreground = ActivityCompat.checkSelfPermission(this,
+                                                                Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+
+        if (foreground) {
+            boolean background = ActivityCompat.checkSelfPermission(this,
+																	Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
+
+            if (background) {
+                handleLocationUpdates();
+            } else {
+                ActivityCompat.requestPermissions(this,
+                                                  new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, REQUEST_CODE_PERMISSIONS);
+            }
+        } else {
+            ActivityCompat.requestPermissions(this,
+                                              new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                                                  Manifest.permission.ACCESS_BACKGROUND_LOCATION}, REQUEST_CODE_PERMISSIONS);
+        }
+    } 
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE_PERMISSIONS) {
+            boolean foreground = false, background = false;
+            for (int i = 0; i < permissions.length; i++) {
+                if (permissions[i].equalsIgnoreCase(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                    //foreground permission allowed
+                    if (grantResults[i] >= 0) {
+                        foreground = true;
+                        Toast.makeText(getApplicationContext(), "Izin lokasi latar depan diizinkan", Toast.LENGTH_SHORT).show();
+                        continue;
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Izin Lokasi ditolak", Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                }
+
+                if (permissions[i].equalsIgnoreCase(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+                    if (grantResults[i] >= 0) {
+                        foreground = true;
+                        background = true;
+                        //  Toast.makeText(getApplicationContext(), "Background location location permission allowed", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Toast.makeText(getApplicationContext(), "Background location location permission denied", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            }
+
+            if (foreground) {
+                if (background) {
+                    handleLocationUpdates();
+                } else {
+                    handleForegroundLocationUpdates();
+                }
+            }
+        }
+    }
+
+    private void handleLocationUpdates() {
+        //foreground and background
+        // Toast.makeText(getApplicationContext(),"Start Foreground and Background Location Updates",Toast.LENGTH_SHORT).show();
+    }
+
+    private void handleForegroundLocationUpdates() {
+        //handleForeground Location Updates
+        //   Toast.makeText(getApplicationContext(),"Start foreground location updates",Toast.LENGTH_SHORT).show();
+    }
+		
+		
+		
+		
+		
+		
+	////JIKA USER SUDAH TERDAFTAR . KETIKA APLIKASI DI TUTUP MAKA OTOMATIS LOGIN KE HOME
+	@Override
+    protected void onStart() {	
+	 RequestLocationPermission();
+		mAuthListener = new FirebaseAuth.AuthStateListener() {
+			@Override
+			public void onAuthStateChanged(@NonNull FirebaseAuth mAuth) {
+				FirebaseUser mUser = mAuth.getCurrentUser();
+				if (mUser != null) {				 
+					Intent intent = new Intent(PhoneLogin.this, HomeActivity.class);
+					startActivity(intent);
+					}else{
+
+
+					
+			    }
+
+            }
+        };
+
+		super.onStart();	
+
+    }
+}
+
+
+
+
+
+FragmentMapsCustomers.java
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.Manifest;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentActivity;
+import android.app.Activity;
+import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.support.annotation.Nullable;
+import de.hdodenhof.circleimageview.CircleImageView;
+import android.widget.TextView;
+import java.util.Map;
+import android.util.Log;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import java.util.HashMap;
+import java.util.Map;
+import android.content.Intent;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationSettingsRequest;
+import android.app.NotificationChannel;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+import android.content.IntentSender;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import android.location.Location;
+import com.google.android.gms.location.LocationCallback;
+import java.util.List;
+import android.os.Looper;
+import android.support.v4.app.ActivityCompat;
+import android.os.Build;
+import android.content.pm.PackageManager;
+import com.google.android.gms.maps.model.CameraPosition;
+import android.support.v7.app.AlertDialog;
+import android.content.DialogInterface;
+import com.google.firebase.storage.StorageReference;
+import android.widget.Toast;
+import java.util.Calendar;
+import com.firebase.geofire.GeoFire;
+import com.google.firebase.auth.FirebaseAuth;
+import android.location.Geocoder;
+import android.location.Address;
+import java.util.Locale;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBuffer;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import android.widget.AutoCompleteTextView;
+import com.google.android.gms.maps.model.LatLngBounds;
+import android.widget.AdapterView;
+import android.text.Html;
+import android.widget.Button;
+import com.google.android.gms.location.LocationListener;
+import android.widget.EditText;
+import java.io.IOException;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import java.util.ArrayList;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import android.graphics.Color;
+import org.w3c.dom.Document;
+import android.os.AsyncTask;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import android.support.v4.app.FragmentTransaction;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import android.support.annotation.NonNull;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import android.widget.ImageButton;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQueryEventListener;
+import com.google.firebase.database.DatabaseError;
+import android.os.ResultReceiver;
+import android.os.Handler;
+import com.bumptech.glide.Glide;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.Bitmap;
+import com.firebase.geofire.util.Constants;
+import android.annotation.SuppressLint;
+import android.support.v4.view.ViewPager;
+import android.view.animation.TranslateAnimation;
+import android.view.View.OnClickListener;
+import android.view.KeyEvent;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import android.net.Uri;
+import android.widget.RelativeLayout;
+import android.support.v4.widget.NestedScrollView;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.Animator;
+import android.support.v7.widget.RecyclerView;
+import android.widget.ImageView;
+import android.text.TextWatcher;
+import android.text.Editable;
+import com.google.firebase.database.Query;
+import android.support.v7.widget.LinearLayoutManager;
+import android.widget.SearchView;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import android.content.SharedPreferences;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import android.widget.LinearLayout;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.constraint.ConstraintLayout;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import android.animation.AnimatorSet;
+import com.google.android.gms.location.places.PlaceDetectionApi;
+import com.google.android.gms.location.places.PlaceLikelihood;
+import com.google.android.gms.maps.SupportMapFragment;
+import org.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.Canvas;
+import com.google.android.gms.maps.model.GroundOverlay;
+import android.animation.ValueAnimator;
+import android.animation.IntArrayEvaluator;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
+import android.location.LocationManager;
+import com.google.android.gms.maps.GoogleMapOptions;
+import android.view.animation.Animation;
+import android.widget.ProgressBar;
+
+
+public class FragmentMapsCustomers extends Fragment 
+implements  LocationListener,  GoogleApiClient.ConnectionCallbacks,
+GoogleApiClient.OnConnectionFailedListener {
+   
+	
+	private static final String TAG = FragmentMapsCustomers.class.getSimpleName();
+	protected static final int PLAY_SERVICES_RESOLUTION_REQUEST = 300193; //Why wife
+    protected static final int UPDATE_INTERVAL = 5000; //5 segundos
+    protected static final int FATEST_INTERVAL = 500;
+    protected static final int DISPLACEMENT = 5;
+	protected static final int MY_PERMISSION_REQUEST_CODE = 7192;
+    protected static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    protected static final int REQUEST_CHECK_SETTINGS = 0x1;
+	protected final static int REQUEST_LOCATION = 199;
+
+	protected int RESULT_OK = 1;
+	protected static final int REQUEST_LOCATION_PERMISSION = 1;
+    protected static final int REQUEST_PICK_PLACE = 2;
+	protected String SEARCH_TYPE;
+
+    protected static final String TRACKING_LOCATION_KEY = "tracking_location";
+	protected boolean mTrackingLocation;
+	protected AnimatorSet mRotateAnim;
+	protected static final float DEFAULT_ZOOM = 15f;
+	protected final static int PLACE_PICKER_REQUEST = 999;
+
+	protected GoogleMap mMap;
+    protected MapView mapView;
+    protected GoogleApiClient mGoogleApiClient;
+	protected LocationRequest mLocationRequest;
+    protected Location mLastLocation;
+	protected FusedLocationProviderClient mFusedLocationClient;
+	protected PendingResult<LocationSettingsResult> result;
+
+
+
+	protected FirebaseAuth mAuth;
+	protected FirebaseUser mCurentUsers;
+
+	protected View view;
+	
+	
+	
+	public FragmentMapsCustomers() {
+
+    }
+
+	public static FragmentMapsCustomers newInstance() {
+        FragmentMapsCustomers fragment = new FragmentMapsCustomers();
+        return fragment;
+    }
+
+    public interface OnMessageReadListener {
+        public void onMessageRead(String message);
+    }
+
+
+
+	@Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_maps_customers, container, false);
+        bindViews(view);
+		return view;
+	}
+
+	@Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+		mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+			.addConnectionCallbacks(this)
+			.addOnConnectionFailedListener(this)
+			.addApi(LocationServices.API)
+			.build();
+        mLocationRequest = new LocationRequest();
+		mLocationRequest.setInterval(10000);
+		mLocationRequest.setFastestInterval(10000);
+		mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mapView.onCreate(savedInstanceState);
+		
+		init();
+	}
+	
+	
+    private void bindViews(View view) {
+		mapView = (MapView) view.findViewById(R.id.map_users); 
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+		
+	}
+
+    private void init(){
+
+	    mAuth = FirebaseAuth.getInstance();
+		mCurentUsers = mAuth.getInstance().getCurrentUser();
+		
+	}
+	
+	
+
+	//M MAP READY GOOGLE MAPS
+	private void setUpMap() {
+        if (mMap == null)
+            mapView.getMapAsync(new OnMapReadyCallback() {
+
+					@Override
+					public void onMapReady(GoogleMap googleMap) {
+						mMap = googleMap;
+						LatLng kotabumi = new LatLng(-4.8345570, 104.8968170);
+						mMap.moveCamera(CameraUpdateFactory.newLatLng(kotabumi));
+						CameraUpdate center = CameraUpdateFactory.newLatLng(kotabumi);
+						CameraUpdate zoom=CameraUpdateFactory.zoomTo(14);
+						mMap.moveCamera(center);
+						mMap.animateCamera(zoom);	
+						mMap.getUiSettings().setMyLocationButtonEnabled(false);
+						mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+
+						if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+							if (ActivityCompat.checkSelfPermission(getActivity(),
+																   Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+								mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+								mMap.setMyLocationEnabled(true);
+							} else {
+								//Request Location Permission
+								CheckLocationPermission();
+
+								mMap.setMyLocationEnabled(true);
+							}
+						} else {
+							mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+							mMap.setMyLocationEnabled(true);
+
+						}
+					}								
+				});
+
+	}
+
+
+	LocationCallback mLocationCallback = new LocationCallback(){
+		@Override
+		public void onLocationResult(LocationResult locationResult) {
+            for(Location location : locationResult.getLocations()){
+                if(getActivity()!=null){
+                    mLastLocation = location;
+					//place			
+                    LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
+
+					mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+					mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
+
+				}
+			}
+		}
+    };
+	
+	//INI LOKASI PERMITION DI LATAR BLAKANG
+	public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+    private void CheckLocationPermission() {
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+			!= PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+																	Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                new AlertDialog.Builder(getActivity())
+					.setTitle("Location Permission Needed")
+					.setMessage("This app needs the Location permission, please accept to use location functionality")
+					.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialogInterface, int i) {
+							//Prompt the user once explanation has been shown
+							ActivityCompat.requestPermissions(getActivity(),
+															  new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+															  MY_PERMISSIONS_REQUEST_LOCATION );
+							//ImagemarkerPikerLocation.setVisibility(View.VISIBLE);
+						}
+					})
+					.create()
+					.show();
+
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(getActivity(),
+												  new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+												  MY_PERMISSIONS_REQUEST_LOCATION );
+
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_LOCATION: {
+					// If request is cancelled, the result arrays are empty.
+					if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+						if (ActivityCompat.checkSelfPermission(getActivity(),
+															   Manifest.permission.ACCESS_FINE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED) {
+
+							/*mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+							 mLocationCallback, Looper.myLooper());*/
+							mMap.setMyLocationEnabled(true);
+
+							//	startTrackingLocation();
+						}
+
+					} else {
+						// if not allow a permission, the application will exit
+						Intent intent = new Intent(Intent.ACTION_MAIN);
+						intent.addCategory(Intent.CATEGORY_HOME);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						startActivity(intent);
+						System.exit(0);
+					}
+				}
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	@Override
+	public void onConnected(Bundle bundle) {
+		if (!hasPermission(Manifest.permission.ACCESS_FINE_LOCATION))
+            return;
+
+        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (location == null)
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        else
+            handleNewLocation(location);
+        Log.d(TAG, "onConnected");
+	}
+
+
+
+	private void handleNewLocation(Location location) {
+		LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
+		mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+		mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
+
+    }
+
+
+    private boolean hasPermission(String permission) {
+        return ActivityCompat.checkSelfPermission(getActivity(), permission) == PackageManager.PERMISSION_GRANTED;
+
+    }
+
+
+
+	@Override
+	public void onConnectionSuspended(int i) {
+
+	}
+
+
+
+	@Override
+	public void onLocationChanged(Location location) {
+		mLastLocation = location;
+		mLocationRequest = LocationRequest.create()
+			.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+			.setInterval(50000)
+			.setFastestInterval(25000);			
+
+	}
+
+
+	@Override
+	public void onConnectionFailed(ConnectionResult connectionResult) {
+		if (connectionResult==null){   
+			//btnPleacesPiker.setVisibility(View.INVISIBLE);
+		}
+	}
+	
+	
+	
+	
+
+	@Override
+	public void onStart(){
+		//EnableLocationDialogGoogle(view);	
+		super.onStart();
+	}
+
+
+    @Override
+    public void onResume(){        
+		setUpMap();
+        mapView.onResume();  	
+		super.onResume();   
+    }
+
+    @Override
+    public void onDestroy(){
+        mapView.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
+    public  void onLowMemory(){
+        mapView.onLowMemory();
+        super.onLowMemory();
+    }
+
+	@Override
+	public void onPause(){
+
+		super.onPause();
+	}
+
+
+    @Override
+    public void onStop() {
+		//mMap.clear();
+		super.onStop(); 
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+ManiFast.xml
+[JANGAN LUPA COPYKAN KODE PERMITION]
+
+
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
+    <!--jalankan di latar belakang-->
+    <uses-permission android:name="android.permission.RUN_IN_BACKGROUND"/>
+
+    <!--akses lokasi pasti hanya saat di latar depan-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+    <!--akses perkiraan lokasi (berbasis jaringan) hanya di latar depan-->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <!--dapatkan akses jaringan penuh-->
+   
+    <!--WRITE_MEDIA_STORAGE-->
+    <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE"/>
+
+    <!--STORAGE_INTERNAL-->
+    <uses-permission android:name="android.permission.STORAGE_INTERNAL"/>
+
+    <!--membaca konten penyimpanan bersama Anda-->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <!--memodifikasi atau menghapus konten penyimpanan bersama Anda-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <!--membaca pesan teks (SMS atau MMS) Anda-->
+    <uses-permission android:name="android.permission.READ_SMS"/>
+		
+		
+	<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+	
+
+	<!-- READ/WRITE_EXTERNAL_STORAGE permissions are required to upload or download files from/into external storage. -->
+	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+		
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
